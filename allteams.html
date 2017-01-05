@@ -1,0 +1,207 @@
+{% extends "main.html" %} {% block content %}
+<!--<div class="row top-menu">
+    <div class="col-md-10"></div>
+    <div class="col-md-2 text-right">
+        <a href="{{url_for('showLogin')}}">Click Here to Log in </a>
+    </div>
+</div>
+<div class='flash'>
+    {% with messages = get_flashed_messages() %} {% if messages %}
+    <ul>
+        {% for message in messages %}
+        <li> <strong> {{ message }} </strong> </li>
+        {% endfor %}
+    </ul>
+    {% endif %} {% endwith %}
+</div>-->
+<!-- Navigation -->
+<br>
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="container">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">CricDex</a>
+                </div>
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li>
+                            <a href="#">About</a>
+                        </li>
+                        <li>
+                            <a href="#">Services</a>
+                        </li>
+                        <li>
+                            <a href="#">Contact</a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- /.navbar-collapse -->
+            </div>
+            <!-- /.container -->
+        </nav>
+
+        <div class="container">
+
+            <!-- Page Heading -->
+            <div class="row">
+                <div class="col-lg-12">
+                    <h2 class="page-header">Teams
+                    </h2>
+                </div>
+            </div>
+            <!-- /.row -->
+            <div class="row">
+            <div class="col-lg-12">
+                    {% for team in teams %}
+                    <h3 class="page-header">{{team.name}}
+                    </h3>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Projects Row -->
+            <div class="row">
+                {% for i in players %}
+                <div class="col-md-3 portfolio-item">
+                  <!-- Modal -->
+                  <div class="modal fade" id="myModal" role="dialog">
+                    <div class="modal-dialog">
+                    
+                      <!-- Modal content-->
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal">&times;</button>
+                          <h4 class="modal-title">{{i.name}}</h4>
+                        </div>
+                        <div class="modal-body">
+                          <table border=1 width=100%>
+                          <tr>
+                          <td>{{i.info}}</td>
+                          <td><img align='right' class="img-responsive" src="/static/{{i.picture}}" alt=""></td>
+                          </tr>
+                          </table>
+                          
+                        </div>
+                        <div class="modal-footer">
+                          <p align='center'><a href='#'>View Profile</a></p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <a  href= "#myModal" data-toggle="modal" data-target="#myModal">
+                        <img  style='border-radius: 20%' align='middle' class="img-responsive" src="/static/{{i.picture}}" alt="">
+                        <p align='center'>{{i.name}}</p>
+                        </a>
+                        <p align='center'>View Profile</p>
+                        
+                </div>
+                {% endfor %}
+                <div class="col-md-3 portfolio-item">
+                    <a href="#">
+                        <img class="img-responsive" src="{{url_for('static', filename='1.jpg')}}" alt="">
+                    </a>
+                </div>
+                <div class="col-md-3 portfolio-item">
+                    <a href="#">
+                        <img class="img-responsive" src="{{url_for('static', filename='2.jpg')}}" alt="">
+                    </a>
+                </div>
+                <div class="col-md-3 portfolio-item">
+                    <a href="#">
+                        <img class="img-responsive" src="{{url_for('static', filename='3.jpg')}}" alt="">
+                    </a>
+                </div>
+            </div>
+            <!-- /.row -->
+            
+
+            <!-- Projects Row -->
+            <div class="row">
+                <div class="col-md-3 portfolio-item">
+                    <a href="#">
+                        <img class="img-responsive" src="http://placehold.it/750x450" alt="">
+                    </a>
+                </div>
+                <div class="col-md-3 portfolio-item">
+                    <a href="#">
+                        <img class="img-responsive" src="http://placehold.it/750x450" alt="">
+                    </a>
+                </div>
+                <div class="col-md-3 portfolio-item">
+                    <a href="#">
+                        <img class="img-responsive" src="http://placehold.it/750x450" alt="">
+                    </a>
+                </div>
+                <div class="col-md-3 portfolio-item">
+                    <a href="#">
+                        <img class="img-responsive" src="http://placehold.it/750x450" alt="">
+                    </a>
+                </div>
+            </div>
+            <!-- /.row -->
+
+            <!-- Projects Row -->
+            <div class="row">
+                <div class="col-md-3 portfolio-item">
+                    <a href="#">
+                        <img class="img-responsive" src="http://placehold.it/750x450" alt="">
+                    </a>
+                </div>
+                <div class="col-md-3 portfolio-item">
+                    <a href="#">
+                        <img class="img-responsive" src="http://placehold.it/750x450" alt="">
+                    </a>
+                </div>
+                <div class="col-md-3 portfolio-item">
+                    <a href="#">
+                        <img class="img-responsive" src="http://placehold.it/750x450" alt="">
+                    </a>
+                </div>
+                <div class="col-md-3 portfolio-item">
+                    <a href="#">
+                        <img class="img-responsive" src="http://placehold.it/750x450" alt="">
+                    </a>
+                </div>
+            </div>
+            <!-- /.row -->
+
+            <hr>
+
+            <!-- Pagination -->
+            <div class="row text-center">
+                <div class="col-lg-12">
+                    <ul class="pagination">
+                        <li>
+                            <a href="#">&laquo;</a>
+                        </li>
+                        <li class="active">
+                            <a href="#">1</a>
+                        </li>
+                        <li>
+                            <a href="#">2</a>
+                        </li>
+                        <li>
+                            <a href="#">3</a>
+                        </li>
+                        <li>
+                            <a href="#">4</a>
+                        </li>
+                        <li>
+                            <a href="#">5</a>
+                        </li>
+                        <li>
+                            <a href="#">&raquo;</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- /.row -->
+
+{% endblock %}  
