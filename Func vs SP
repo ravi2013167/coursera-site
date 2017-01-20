@@ -1,0 +1,46 @@
+Functions are computed values and cannot perform permanent environmental changes to SQL Server (i.e. no INSERT or UPDATE statements allowed).
+
+A Function can be used inline in SQL Statements if it returns a scalar value or can be joined upon if it returns a result set.
+
+Stored Procedure (SP)           | Function (UDF - User Defined           |
+|                                 | Function)                              |
++---------------------------------+----------------------------------------+
+| SP can return zero , single or  | Function must return a single value    |
+| multiple values.                | (which may be a scalar or a table).    |
++---------------------------------+----------------------------------------+
+| We can use transaction in SP.   | We can't use transaction in UDF.       |
++---------------------------------+----------------------------------------+
+| SP can have input/output        | Only input parameter.                  |
+| parameter.                      |                                        |
++---------------------------------+----------------------------------------+
+| We can call function from SP.   | We can't call SP from function.        |
++---------------------------------+----------------------------------------+
+| We can't use SP in SELECT/      | We can use UDF in SELECT/ WHERE/       |
+| WHERE/ HAVING statement.        | HAVING statement.                      |
++---------------------------------+----------------------------------------+
+| We can use exception handling   | We can't use Try-Catch block in UDF.   |
+| using Try-Catch block in SP.    |                                        |
++---------------------------------+----------------------------------------+
+
+Differences between stored procedures and user-defined functions:
+
+Stored procedures cannot be used in Select statements.
+Stored procedures support Deferred Name Resolution.
+Stored procedures are generally used for performing business logic.
+Stored procedures can return any datatype.
+Stored procedures can accept greater numbers of input parameter than user defined functions. Stored procedures can have up to 21,000 input parameters.
+Stored procedures can execute Dynamic SQL.
+Stored procedures support error handling.
+Non-deterministic functions can be used in stored procedures.
+
+
+User-defined functions can be used in Select statements.
+User-defined functions do not support Deferred Name Resolution.
+User-defined functions are generally used for computations.
+User-defined functions should return a value.
+User-defined functions cannot return Images.
+User-defined functions accept smaller numbers of input parameters than stored procedures. UDFs can have up to 1,023 input parameters.
+Temporary tables cannot be used in user-defined functions.
+User-defined functions cannot execute Dynamic SQL.
+User-defined functions do not support error handling.  RAISEERROR OR @@ERROR are not allowed in UDFs.
+Non-deterministic functions cannot be used in UDFs. For example, GETDATE() cannot be used in UDFs.

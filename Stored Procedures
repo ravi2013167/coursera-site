@@ -1,0 +1,175 @@
+1. sp_monitor
+
+sp_monitor displays statistics about the instance of SQL Server in which it runs. It takes no parameters and returns all kinds of interesting information, including how busy SQL Server has kept the machine's CPU, the number of input and output packets the server has processed, the number of errors it has encountered, a count of reads and writes, and the number of successful and attempted logins.
+
+When you run this stored procedure from the master database. It reports each statistic as a number in the form of either number(number)-number% or number(number). The first number is since SQL Server restarted and the second is since sp_monitor was last run, so you can accumulate and explore statistics over time, and some values also provide the percentage difference between the two.
+
+2. sp_bindsession
+
+Support for transactions is one of the most important reasons to use database engines such as SQL Server; hopefully you make frequent, wise use of them in your applications. But did you know that you can bind operations on different connections in the same instance of SQL Server to the same transaction? This is conceptually a little like using the Distributed Transaction Coordinator to bind transactions across heterogeneous database engines. Once you let your imagination run free, it is easy to find a lot of uses for sp_bindsession and its sibling sp_getbindtoken.
+
+DECLARE @bindToken varchar(255)
+EXECUTE sp_getbindtoken @bindToken OUTPUT
+SELECT @bindToken AS Token
+
+3. sp_create_removable
+
+Related: sp_certify_removable
+
+Have you ever needed to put a SQL Server database on a read-only media, such as a CD? Then you need sp_create_removable, which creates a removable media database. The stored procedure creates three or more files for the system catalog tables, transaction log, and one or more for the data tables, and places the database on those files. You can't use CREATE DATABASE or Enterprise Manager to create the removable database. You'll need to run sp_create_removable with sysadmin privileges.
+
+sp_create_removable 'WxManagerRem', 
+   'WxManagerRemSYS',
+   'E:\WxManagerRem.mdf', 4, 
+   'WxManagerRemLog',
+   'E:\WxManagerRem.LDF', 2,
+   'WxManagerRemData',
+   'E:\WxManagerRem.ndf', 4
+GO
+
+sp_certify_removable 'WxManagerRem', 'auto'
+
+4. sp_addmessage
+
+Related: sp_altermessage, sp_dropmessage
+
+SQL Server contains a rich set of error messages that it uses to annoy users, admins, and developers. Actually, SQL Server does a pretty decent job of letting you know exactly what went wrong with an errant T-SQL operation, and most development tools let you respond to problems and perhaps retry operations. There are hundreds of standard messages, many of which are formatted to allow parameter substitution for customized feedback, such as to specify the objects involved in the problem.
+
+USE master
+EXEC sp_addmessage @msgnum = 60000, 
+   @severity = 16, 
+   @msgtext = 
+      N'The item named %s already exists in %s.', 
+   @lang = 'us_english'
+
+5. sp_executesql
+
+A useful technique when you need utmost flexibility in a T-SQL application is to build the code dynamically and execute it on the fly. Microsoft has made such dynamic execution far more efficient than in earlier versions of SQL Server, such as by caching the execution plan for multiple executions. The danger, of course, is that building a SQL statement on the fly and concatenating parameter values is that it opens up the app to SQL injection attacks, so it should be used with caution and careful validation of any user-controllable input. Dynamic SQL also has different security issues.
+
+USE pubs
+GO
+sp_executesql N'USE Northwind'
+GO
+SELECT * FROM Shippers
+GO
+
+6. sp_server_info
+
+Sometimes it is handy to find out things about the environment you're running in. sp_server_info returns a list of attributes about the SQL Server instance, the database gateway in use, or the underlying datasource. The attributes returned include such mundane things as OWNER_TERM for what the database calls an owner (hopefully it is not a shock that it is "owner" for SQL Server), maximum length of table and other object names, whether certain operations are permitted, and the size of things such as the maximum number of columns in an index.
+
+sp_server_info
+sp_server_info @attribute_id = 2
+
+7. sp_procoption
+
+This is one of those rather interesting anomalies in SQL Server. According to BOL, sp_procoption "sets procedure options." The interesting part is that "s" at the end of "options." Despite the description, sp_procoption sets exactly one option to configure a stored procedure for auto execution when SQL Server starts up. Only objects in the master database owned by dbo can have its startup setting changed, and it's restricted to stored procedures with no parameters.
+
+USE master -- only in master
+GO
+EXEC sp_procoption 'sp_IndexRebuild', 'startup', 
+    'true'
+
+8. sp_datatype_info
+
+This system stored procedure returns just about everything you need to know about the datatypes available in any SQL Server database. The list includes types that are used as identity fields, a couple of arcane types, and any user-defined data types in the current database.
+Anyway, the information returned includes the internal type name and id, the precision of numeric types (essentially the number of digits), the characters used for literal values (such as ' for strings and $ for money), whether it is nullable, and plenty more.
+
+sp_datatype_info
+sp_datatype_info -11
+
+9. sp_depends
+
+One of the things that drives me nuts sometimes about relational databases is the incredible weave of dependencies in any non-trivial database. The problem commonly rears its ugly head when I try to delete an object only to find out that it has all kinds of stuff that depends on that object, such as how foreign keys and stored procedures depend on the existence of a particular table. Usually I look at the error message, go delete what it tells me is the problem dependency, try to delete the object again, go delete the dependencies, and start over.
+
+USE Northwind
+GO
+sp_depends 'Order Details'
+
+10. sp_processmail
+
+One of the geekier things you can do with SQL Server is to send it an e-mail in case you think it is lonely or down. Actually, you can send it a single query in the text of an e-mail and SQL Server will send the results of the query to the original sender and anyone on the cc: list as an attached file. E-mails sent to the server are processed when you run this stored procedure, so you'll probably want to run it at regular intervals to clear out the inbox, perhaps as part of a SQL Agent job.
+
+sp_processmail @subject = 'SQL:pubs', 
+    @filetype = 'TXT', @separator = ',', 
+    @dbuse = 'pubs'
+
+11. sp_helpprotect
+
+Secure databases are critical to today's distributed applications, and SQL Server provides plenty of tools you can use to lock down the server. But making a server or database secure is a complex process, and it is far too easy to configure conflicting security settings. sp_helprotect is handy for getting information about how objects are configured for permissions in the current database.
+
+USE Northwind
+exec sp_helprotect
+
+12. sp_getapplock
+
+Transactions and object locks are a fact of life with relational databases. SQL Server has rich support for both along with many features that serve to relieve the severe concurrency problems that a heavily-used database can suffer. Most of the time you'll be in good shape using the built-in features and you don't have to worry about going deeper. But when you need to go deeper, take a look at sp_getapplock.
+
+13. sp_makewebtask
+
+One of the coolest features to demo in SQL Server 2000 is how it can automatically create a Web page based on the results of a query. The scenario is that you have a Web page that displays data from the database that doesn't change too often, such as your product catalog. You can have SQL Server automatically regenerate the page whenever any data changes, such as a new product addition or a price change, and it can even upload it to your Web server.
+
+14. sp_MSforeachdb*, sp_MSforeachtable*
+
+Have you ever wanted to do any kind of processing for every database on a server or every table in a database? If so, the undocumented stored procedures sp_MSforeachdb and sp_MSforeachtable are exactly what you need. These are just about as easy to use as they can be. Simply pass each procedure a string with the T-SQL command you want to execute for each database or table:
+
+sp_MSforeachdb "print '?' DBCC CHECKDB('?')"
+
+USE Northwind
+GO
+sp_MSforeachtable "print '?' DBCC DBREINDEX('?')"
+
+15. sp_fixindex*
+
+sp_fixindex is a handy undocumented procedure that uses the also undocumented DBCC REPAIRINDEX tool to fix corrupted indexes for system tables. It takes three parameters: the name of the database to repair, the table whose index you want to repair, and the index id of the problem index.
+
+The code below repairs the indexes of the systypes table in Northwind after forcing any dirty pages in memory to be written to disk with the CHECKPOINT statement. Note that no other users can be connected to the database when you run this code, so you may need to set the Single User option to true using the sp_dboption procedure in the master database.
+
+USE Northwind
+GO
+CHECKPOINT
+GO
+sp_fixindex 'Northwind', 'systypes', 1
+
+16. Sp_help <Object Name> 
+
+The Sp_help is a system Stored Procedure that Reports information about a database object, a user-defined data type, or a data type. It will only return information for objects that are able to be referenced within the database you are currently in.
+
+To Find All Database Object Information
+
+exec sp_help
+
+17. sp_helptext <Object Name>
+ 
+The sp_helptext is a system Stored Procedure that displays the definition that is used to create an object in multiple rows. The following example displays the definition of the procedure SelectUserDetail in the master database.
+ 
+Example
+ 
+exec sp_helptext SelectUserDetail
+
+18. Sp_depends <Object Name>
+ 
+The sp_helptext is a system Stored Procedure that is used to get the dependent object details. If you are working in a large database then before changing a table or a Stored Procedure you may need to know about the tables, Stored Procedures and functions dependencies by using the sp_depends procedure.
+ 
+Example
+exec sp_depends Registration
+
+19. sp_spaceused (Transact-SQL)
+
+Displays the number of rows, disk space reserved, and disk space used by a table, indexed view, or Service Broker queue in the current database, or displays the disk space reserved and used by the whole 
+
+USE AdventureWorks2012;  
+GO  
+EXEC sp_spaceused N'Purchasing.Vendor';  
+GO  
+
+20. sp_validname (Transact-SQL)
+
+Checks for valid SQL Server identifier names. All nonbinary and nonzero data, including Unicode data that can be stored by using the nchar, nvarchar, or ntext data types, are accepted as valid characters for identifier names.
+
+sp_validname [@name =] 'name'   
+     [, [@raise_error =] raise_error]
+[ @name= ] 'name'
+
+Is the name of the identifiers for which to check validity. name is sysname, with no default. name cannot be NULL, cannot be an empty string, and cannot contain a binary-zero character.
+[ @raise_error= ] raise_error
+Specifies whether to raise an error. raise_error is bit, with a default of 1. This means that errors will appear. 0 causes no error messages to appear.
